@@ -1,0 +1,82 @@
+PRACTICE PROBLEM 1
+
+Write a query to count the number of non-null rows in the low column.
+
+SELECT COUNT(low)
+  FROM tutorial.aapl_historical_stock_price
+
+This query is counting all rows in the 'low' column that have non-null values.  The answer is 3,535.
+
+PRACTICE PROBLEM 2
+
+Write a query that determines counts of every single column. Which column has the most null values?
+
+SELECT COUNT(date) AS date_count,
+    COUNT(year) AS year_count,
+    COUNT(month) AS month_count,
+    COUNT(open) AS open_count,
+    COUNT(high) AS high_count,
+    COUNT(low) AS low_count,
+    COUNT(close) AS close_count,
+    COUNT(volume) AS volume_count
+  FROM tutorial.aapl_historical_stock_price
+
+The column 'high' has the most null values; there are only 3,531 non-null values compared to 3,555 total rows.
+
+PRACTICE PROBLEM 3
+
+Write a query to calculate the average opening price (hint: you will need to use both COUNT and SUM, as well as some simple arithmetic.).
+
+Step 1: SELECT COUNT(open)
+  FROM tutorial.aapl_historical_stock_price
+
+(3,541 rows)
+
+Step 2: SELECT SUM(open)
+  FROM tutorial.aapl_historical_stock_price
+
+(583,483.72)
+
+avg opening price = 583,483.72 / 3,541 = 164.78 is the average opening price
+
+Note: I checked the answer and was reminded that I can do the arithmatic within SQL, like this:
+SELECT SUM(open)/COUNT(open) AS avg_open_price
+  FROM tutorial.aapl_historical_stock_price
+
+PRACTICE PROBLEM 4
+
+What was Apple's lowest stock price (at the time of this data collection)?
+
+SELECT MIN(low) AS min_low
+  FROM tutorial.aapl_historical_stock_price
+
+answer = 6.36.  
+
+This is the minimum of the low daily stock price.  Note: you can do the minimum of all stock price columns (open, close, low, high)
+but the minimum of the open stock price column is 0 - which probably means the market was closed that day, and is a misleading figure.
+
+PRACTICE PROBLEM 5
+
+What was the highest single-day increase in Apple's share value?
+
+SELECT MAX(high - low) AS max_increase
+  FROM tutorial.aapl_historical_stock_price
+
+answer = 59
+
+Excellent, I learned you can combine arithmatic in the aggregation functions. 
+
+However, I checked the answer and a possible solution is:
+SELECT MAX(close - open)
+  FROM tutorial.aapl_historical_stock_price
+
+which returns 32.58  
+
+My mistake was to use high and low columns instead of open and close columns.
+
+PRACTICE PROBLEM 6
+
+
+
+
+
