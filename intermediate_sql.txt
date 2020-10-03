@@ -76,6 +76,52 @@ My mistake was to use high and low columns instead of open and close columns.
 
 PRACTICE PROBLEM 6
 
+Write a query that calculates the average daily trade volume for Apple stock.
+
+SELECT AVG(volume)
+  FROM tutorial.aapl_historical_stock_price
+
+This calculates average on the volume colume.
+
+PRACTICE PROBLEM 7
+
+Calculate the total number of shares traded each month. Order your results chronologically.
+
+SELECT year,
+       month,
+       SUM(volume) AS monthly_volume
+  FROM tutorial.aapl_historical_stock_price
+GROUP BY year, month
+ORDER BY year, month
+
+This query displays year then month then the total (sum of volume column) of shares each month.  
+Results are sorted by year, then month.
+
+PRACTICE PROBLEM 8
+
+Write a query to calculate the average daily price change in Apple stock, grouped by year.
+
+SELECT year,
+    AVG(high - low) AS avg_price_change
+  FROM tutorial.aapl_historical_stock_price
+GROUP BY year
+
+This query calculatesthe low price column subtracted from the high price column for each row
+and then calculates the average of those values for each year.
+
+PRACTICE PROBLEM 9
+
+Write a query that calculates the lowest and highest prices that Apple stock achieved each month.
+
+SELECT year,
+       month,
+       MAX(high),
+       MIN(low)
+  FROM tutorial.aapl_historical_stock_price
+GROUP BY year, month
+ORDER BY year, month
+
+This query returns the highest high price and lowest low price for each month, because it is grouped by month.
 
 
 
