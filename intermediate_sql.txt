@@ -185,3 +185,73 @@ in order to embed my new calculated column wherever I would like in the dataset.
 
 PRACTICE PROBLEM 13
 
+Write a query that counts the number of 300lb+ players for each of the following regions: 
+West Coast (CA, OR, WA), Texas, and Other (Everywhere else).
+
+SELECT CASE WHEN state IN ('CA', 'OR', 'WA') THEN 'West Coast'
+            WHEN state = 'TX' THEN 'Texas'
+            ELSE 'Other' END AS region,
+            COUNT(1) as players
+  FROM benn.college_football_players
+  WHERE weight >= 300
+GROUP BY region
+
+I had originally tried to put the weight >= 300 in the COUNT function. 
+Instead, I see that the solution does a count on the number of players in each region (as defined by the case statement)
+and then limits that to players weighing more than 300lbs with the WHERE statement.
+
+PRACTICE PROBLEM 14
+
+Write a query that calculates the combined weight of all underclass players (FR/SO) in California 
+as well as the combined weight of all upperclass players (JR/SR) in California.
+
+SELECT CASE WHEN year IN ('FR', 'SO') THEN 'underclass'
+            WHEN year IN ('JR', 'SR') THEN 'upperclass'
+            ELSE 'Other' END AS class_level,
+            SUM(weight) AS combined_weight
+  FROM benn.college_football_players
+WHERE state = 'CA'
+GROUP BY 1
+
+This query creates the column labelling players as under or upperclass and then sums the weight of all players,
+before then limiting the results to the sum of player weights in California.
+
+PRACTICE PROBLEM 15
+
+Write a query that displays the number of players in each state, 
+with FR, SO, JR, and SR players in separate columns 
+and another column for the total number of players. 
+Order results such that states with the most players come first.
+
+SELECT state,
+       COUNT(CASE WHEN year = 'FR' THEN 1 ELSE NULL END) AS fr_count,
+       COUNT(CASE WHEN year = 'SO' THEN 1 ELSE NULL END) AS so_count,
+       COUNT(CASE WHEN year = 'JR' THEN 1 ELSE NULL END) AS jr_count,
+       COUNT(CASE WHEN year = 'SR' THEN 1 ELSE NULL END) AS sr_count,
+       COUNT(1) AS total_players
+  FROM benn.college_football_players
+GROUP BY state
+ORDER BY total_players DESC
+
+Total transparency!  I had to use the 'see the answer' to pull this query together.
+However, I've learned that you can use the state column separately from the case statements
+and also do that count as it's own column, just like when you write this query to display
+horizontally.  
+
+PRACTICE PROBLEM 16
+
+Write a query that shows the number of players at schools with names that start with A through M, 
+and the number at schools with names starting with N - Z.
+
+SELECT CASE WHEN school_name < 'n' THEN 'A-M'
+            WHEN school_name >= 'n' THEN 'N-Z'
+            ELSE NULL END AS school_name_group,
+       COUNT(1) AS players
+  FROM benn.college_football_players
+ GROUP BY 1
+
+This was more help I got from 'see the answer'.  I was trying to use ILIKE statements, but that would have 
+been a very long query.  Now I'm reminded to use alphabetizing!  This solution is much simpler.
+
+PRACTICE PROBLEM 17
+
