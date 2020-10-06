@@ -318,3 +318,109 @@ SELECT players.player_name,
 
 This query gets me the columns requested, filtered by the division stated.  
 I'm doing an inner join (i.e. not getting rows that don't match) by stating JOIN.
+
+PRACTICE PROBLEM 22
+
+Write a query that performs an inner join between the tutorial.crunchbase_acquisitions table 
+and the tutorial.crunchbase_companies table, but instead of listing individual rows, count the number of non-null rows in each table.
+
+SELECT COUNT(DISTINCT companies.permalink) AS companies_permalink,
+       COUNT(DISTINCT acquisitions.company_permalink) AS acquisitions_permalink
+  FROM tutorial.crunchbase_companies companies
+  JOIN tutorial.crunchbase_acquisitions acquisitions
+    ON companies.permalink = acquisitions.company_permalink
+
+This query pulls company names if they exist in both tables, the companies table count has the same number of distinct company names (rows) as the acquisitions table count.
+
+PRACTICE PROBLEM 23
+
+Modify the query above to be a LEFT JOIN. Note the difference in results.
+
+SELECT COUNT(DISTINCT companies.permalink) AS companies_permalink,
+       COUNT(DISTINCT acquisitions.company_permalink) AS acquisitions_permalink
+  FROM tutorial.crunchbase_companies companies
+  LEFT JOIN tutorial.crunchbase_acquisitions acquisitions
+    ON companies.permalink = acquisitions.company_permalink
+
+With a left join, the companies table yields more company names (27,326 instead of 1,645) and the 
+acquisitions table has 1,645 matching company names (just like in the inner join).
+
+PRACTICE PROBLEM 24
+
+Count the number of unique companies (don't double-count companies) and unique acquired companies by state. 
+Do not include results for which there is no state data, and order by the number of acquired companies from highest to lowest.
+
+SELECT companies.state_code,
+       COUNT(DISTINCT companies.permalink) AS listed_companies,
+       COUNT(DISTINCT acquisitions.company_permalink) AS acquired_companies
+  FROM tutorial.crunchbase_companies companies
+  LEFT JOIN tutorial.crunchbase_acquisitions acquisitions
+    ON companies.permalink = acquisitions.company_permalink
+WHERE companies.state_code IS NOT NULL
+GROUP BY companies.state_code
+ORDER BY acquired_companies DESC
+
+This query returns the count of companies by state (group by state code) and companies without state name are excluded.  
+
+PRACTICE PROBLEM 25
+
+SELECT companies.state_code,
+       COUNT(DISTINCT companies.permalink) AS listed_companies,
+       COUNT(DISTINCT acquisitions.company_permalink) AS acquired_companies
+  FROM tutorial.crunchbase_acquisitions acquisitions
+  RIGHT JOIN tutorial.crunchbase_companies companies
+    ON companies.permalink = acquisitions.company_permalink
+WHERE companies.state_code IS NOT NULL
+GROUP BY companies.state_code
+ORDER BY acquired_companies DESC
+
+To reproduce the LEFT JOIN results using a RIGHT JOIN, I needed to switch the FROM table (from companies to acquisitions) and switch the JOIN table 
+(from acquisitions to companies)
+
+PRACTICE PROBLEM 26
+
+Write a query that shows a company's name, "status" (found in the Companies table), and the number of unique investors in that company. 
+Order by the number of investors from most to fewest. Limit to only companies in the state of New York.
+
+SELECT companies.name AS company_name,
+       companies.status,
+       COUNT(DISTINCT investments.investor_name) AS unqiue_investors
+  FROM tutorial.crunchbase_companies companies
+  LEFT JOIN tutorial.crunchbase_investments investments
+    ON companies.permalink = investments.company_permalink
+ WHERE companies.state_code = 'NY'
+ GROUP BY 1,2
+ ORDER BY 3 DESC
+
+Well, I had to get help on this one.  I was trying to pull company name from the investments table and that wasn't working.
+This solution pulls company name and status from the companies table and then joins the number of investors to it.
+
+PRACTICE PROBLEM 27
+
+Write a query that lists investors based on the number of companies in which they are invested. 
+Include a row for companies with no investor, and order from most companies to least.
+
+Here is the start of my query:
+
+SELECT investments.investor_name,
+       COUNT (investments.company_name)
+  FROM tutorial.crunchbase_investments investments
+  LEFT JOIN tutorial.crunchbase_companies companies
+  ON companies.permalink = investments.company_permalink
+  GROUP BY 1
+
+This is taking an extraordinary amount of time to run (more than 2 minutes) and I'll come back to it ASAP.
+
+I see that a possible solution is very different, though:
+SELECT CASE WHEN investments.investor_name IS NULL THEN 'No Investors'
+            ELSE investments.investor_name END AS investor,
+       COUNT(DISTINCT companies.permalink) AS companies_invested_in
+  FROM tutorial.crunchbase_companies companies
+  LEFT JOIN tutorial.crunchbase_investments investments
+    ON companies.permalink = investments.company_permalink
+ GROUP BY 1
+ ORDER BY 2 DESC
+
+I wouldn't have thought about using a CASE statement.  I was going to try and work in a WHERE statement to capture null values.
+ WHERE investments.investor_name IS NULL  But actually, I see that if I include this WHERE statement, it will limit my results to NULL values.
+This is why the CASE statement in the solution is needed.
